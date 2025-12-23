@@ -1,0 +1,16 @@
+{
+  "name": "youtube-live-chat-sse",
+  "version": "1.0.0",
+  "description": "YouTube Live Chat streaming via SSE on Vercel",
+  "main": "api/chat.js",
+  "scripts": {
+    "start": "vercel dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {
+    "youtubei": "^1.5.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
