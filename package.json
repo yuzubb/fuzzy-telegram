@@ -1,10 +1,12 @@
 {
-  "name": "youtube-live-chat",
+  "name": "youtube-live-chat-viewer",
   "version": "1.0.0",
+  "main": "server.js",
   "dependencies": {
-    "youtubei": "^1.5.0"
+    "express": "^4.18.2",
+    "youtubei": "^1.4.2"
   },
-  "engines": {
-    "node": "24.x"
+  "scripts": {
+    "start": "node server.js"
   }
 }
