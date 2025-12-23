@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube ライブチャット表示</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+        #chat-container { 
+            height: 400px; overflow-y: scroll; 
+            background: white; border: 1px solid #ccc; 
+            padding: 10px; margin-top: 10px; 
+        }
+        .comment { margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .author { font-weight: bold; color: #cc0000; margin-right: 5px; }
+    </style>
+</head>
+<body>
+    <h1>YouTube ライブチャット</h1>
+    <input type="text" id="videoId" placeholder="ライブ配信のIDを入力">
+    <button onclick="startChat()">チャット表示開始</button>
+
+    <div id="chat-container"></div>
+
+    <script>
+        let eventSource = null;
+
+        function startChat() {
+            const videoId = document.getElementById('videoId').value;
+            const container = document.getElementById('chat-container');
+            
+            if (!videoId) return alert('IDを入力してください');
+            if (eventSource) eventSource.close(); // 既存の接続があれば閉じる
+            
+            container.innerHTML = '<div>接続中...</div>';
+
+            // サーバーのSSEエンドポイントに接続
+            eventSource = new EventSource(`/chat-stream?videoId=${videoId}`);
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const commentEl = document.createElement('div');
+                commentEl.className = 'comment';
+                commentEl.innerHTML = `<span class="author">${data.author}:</span><span class="message">${data.message}</span>`;
+                container.appendChild(commentEl);
+                
+                // 最下部へスクロール
+                container.scrollTop = container.scrollHeight;
+            };
+
+            eventSource.onerror = function() {
+                const errEl = document.createElement('div');
+                errEl.innerText = 'エラーが発生しました。有効なライブIDか確認してください。';
+                container.appendChild(errEl);
+                eventSource.close();
+            };
+        }
+    </script>
+</body>
+</html>
