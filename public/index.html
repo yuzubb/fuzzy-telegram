@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Live Chat</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; }
+        #chat-box { height: 400px; overflow-y: scroll; border: 1px solid #444; padding: 10px; }
+        .comment { margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .author { font-weight: bold; color: #ff4e4e; margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h3>Real-time Chat</h3>
+    <div id="chat-box"></div>
+
+    <script>
+        // URLのパスから videoid を取得 (例: /ABCDEFG)
+        const videoId = window.location.pathname.split('/')[1] || 'YOUR_DEFAULT_ID';
+        const chatBox = document.getElementById('chat-box');
+
+        if (videoId) {
+            // /api/chat に接続 (SSE)
+            const eventSource = new EventSource(`/api/chat?videoid=${videoId}`);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const div = document.createElement('div');
+                div.className = 'comment';
+                div.innerHTML = `<span class="author">${data.author}</span><span>${data.message}</span>`;
+                chatBox.appendChild(div);
+                
+                // 自動スクロール
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
+
+            eventSource.onerror = () => {
+                console.log("接続が切れました。再接続を試みます...");
+            };
+        }
+    </script>
+</body>
+</html>
